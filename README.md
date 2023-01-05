@@ -1,16 +1,31 @@
 # my_app
 
-A new Flutter project.
+## Flutter
+The app communicates with host platform with [pigeon package](https://pub.dev/packages/pigeon) ([type definition](pigeons/type.dart)), but it doesn't support `EventChannel` [(source)](https://github.com/flutter/flutter/issues/66711). So the stream communication must be handled seperately. Check [Event Channel](#event-channel) for more information.
 
-## Getting Started
+---
+## Android
+In android, [foreground service](https://developer.android.com/guide/components/foreground-services) is used in order to achieve. Other type of service is killed when the app is closed. `android:stopWithTask` doesn't work with normal service.
 
-This project is a starting point for a Flutter application.
+Don't forget to add permisions and register service. [example](android/app/src/main/AndroidManifest.xml)
 
-A few resources to get you started if this is your first Flutter project:
+---
+## Issue
+- Sometimes, flutter app just don't start (probably device's problem). [issue](https://github.com/flutter/flutter/issues/93668)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
+## Event Channel
+Continuous data stream uses Flutter's `EventChannel` to communicate with host platform. Our `EventChannel`'s name is `PedometerService/{EventName}`. Note that current `EventChannel` implementation doesn't hold message when there's no listener, so event handlers must be register to channel before registering service.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+## Reference
+### Event
+#### Activate
+when service is ready. \
+eventName: ActivateEvent \
+payload: int (latest number of steps)
+
+#### Sensor
+when host platform send update to step counter. \
+eventName: SensorEvent \
+payload: int (latest number of steps)
